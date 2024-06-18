@@ -208,27 +208,30 @@ void updateTelephoneByName(char *name, char *newTelephone) {
     }
 }
 
-// Hàm tìm kiếm node theo tên
+// Hàm tìm kiếm node theo tên Linear Searching
 void searchByName(char *name) {
     struct node *current = head;
     int found = 0;
+    int position = 0; // Bi?n ð?m v? trí
 
     if (head == NULL) {
         printf("List is empty.\n");
         return;
     }
 
-    // Tìm node theo tên
+    // Tim node theo tên
     do {
         if (strcmp(current->name, name) == 0) {
             printf("Name: %s\n", current->name);
             printf("Telephone: %s\n", current->telephone);
             printf("Email: %s\n", current->email);
             printf("Address: %s\n", current->address);
+            printf("Position: %d\n", position); // In ra v? trí
             found = 1;
             break;
         }
         current = current->next;
+        position++; // Tãng v? trí lên 1
     } while (current != head);
 
     if (!found) {
@@ -236,51 +239,55 @@ void searchByName(char *name) {
     }
 }
 
-// Hàm sắp xếp danh sách liên kết vòng theo tên sử dụng Insertion Sort
-void insertionSort() {
-    struct node *sorted = NULL; // Danh sách đã sắp xếp
-    struct node *current = head;
-    struct node *next;
-    struct node *temp;
-
+// Hàm sắp xếp danh sách liên kết vòng theo tên sử dụng Bubble Sort
+void bubbleSort() {
     if (head == NULL) {
-        printf("List is empty.\n");
         return;
     }
 
-    do {
-        next = current->next;
-        if (sorted == NULL || strcmp(sorted->name, current->name) >= 0) {
-            current->next = (sorted == NULL) ? current : sorted;
-            sorted = current;
-        } else {
-            temp = sorted;
-            while (temp->next != sorted && strcmp(temp->next->name, current->name) < 0) {
-                temp = temp->next;
-            }
-            current->next = temp->next;
-            temp->next = current;
-        }
-        current = next;
-    } while (current != head);
+    int swapped;
+    struct node *ptr1;
+    struct node *lptr = NULL;
 
-    // Thiết lập danh sách vòng lại sau khi sắp xếp
-    temp = sorted;
-    while (temp->next != sorted) {
-        temp = temp->next;
-    }
-    temp->next = sorted;
-    head = sorted;
-    printf("List sorted successfully!\n");
+    do {
+        swapped = 0;
+        ptr1 = head;
+
+        do {
+            if (strcmp(ptr1->name, ptr1->next->name) > 0) {
+                // Hoán ð?i d? li?u gi?a ptr1 và ptr1->next
+                char tempName[100], tempTelephone[20], tempEmail[100], tempAddress[200];
+
+                strcpy(tempName, ptr1->name);
+                strcpy(tempTelephone, ptr1->telephone);
+                strcpy(tempEmail, ptr1->email);
+                strcpy(tempAddress, ptr1->address);
+
+                strcpy(ptr1->name, ptr1->next->name);
+                strcpy(ptr1->telephone, ptr1->next->telephone);
+                strcpy(ptr1->email, ptr1->next->email);
+                strcpy(ptr1->address, ptr1->next->address);
+
+                strcpy(ptr1->next->name, tempName);
+                strcpy(ptr1->next->telephone, tempTelephone);
+                strcpy(ptr1->next->email, tempEmail);
+                strcpy(ptr1->next->address, tempAddress);
+
+                swapped = 1;
+            }
+            ptr1 = ptr1->next;
+        } while (ptr1->next != lptr);
+
+        lptr = ptr1;
+    } while (swapped);
 }
 // Hàm chính
 int main() {
     int choice, n;
     char name[50], telephone[15], email[50], address[100];
-
     // Vòng lặp menu chính
     while (1) {
-        printf("\nCircular Linked List Menu:\n");
+        printf("\nTelephone Directory Management System Menu:\n");
         printf("1. Create Circular Linked List\n");
         printf("2. Add Node at Beginning\n");
         printf("3. Delete Node by Name\n");
@@ -327,7 +334,7 @@ int main() {
                 searchByName(name);
                 break;
             case 6:
-                insertionSort();
+                bubbleSort();
                 break;
             case 7:
                 displayList();
